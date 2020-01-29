@@ -56,6 +56,28 @@ def format_data_to_floats(table):
         table[col] = table[col].str.strip("%").replace('-',0)
         table[col] = pd.to_numeric(table[col], errors='ignore')
 
+def assign_cap_groupings(data_table):
+    caps = {'Small Cap': [],
+        'Mid Cap': [],
+        'Large Cap': []}
+
+    for ticker in data_table.index:
+        mcap = str(data_table.loc[ticker]['Market Cap'])
+
+        if mcap != 'nan':
+            mcap = [int(re.split('(\d+)',mcap)[1]), re.split('(\d+)',mcap)[-1]]
+        else:
+            continue
+            
+        if mcap[1] == 'M':
+            caps['Small Cap'].append(ticker)
+        elif mcap[0] < 10:
+            caps['Mid Cap'].append(ticker)
+        else:
+            caps['Large Cap'].append(ticker)
+        
+    return(caps)       
+        
 def write_data_to_file(list_dfs, ticker):
     file_name = 'Security_Comps'+ ticker + '.xlsx'
     xls_path = '/Users/jakerobinson/Documents/CCA_Finviz/' + file_name
